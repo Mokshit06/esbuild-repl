@@ -1,11 +1,13 @@
 import cors, { CorsOptions } from 'cors';
-import { build, BuildOptions } from 'esbuild';
+import { build, BuildOptions, BuildResult, BuildFailure } from 'esbuild';
 import express from 'express';
 import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
 import { httpPlugin } from './plugins/httpPlugin';
 import { memfsLoader } from './plugins/memfsLoader';
+import formatError from './utils/formatError';
+import formatResult from './utils/formatResult';
 
 const corsOptions: CorsOptions = {
   origin: (origin, cb) => {
@@ -44,16 +46,11 @@ io.on('connection', socket => {
           plugins: [httpPlugin, memfsLoader({ files })],
         });
 
-        socket.emit('result', {
-          files: result.outputFiles.map(f => ({
-            ...f,
-            path: path.parse(f.path).base,
-          })),
-          errors: result.warnings,
-        });
+        socket.emit('result', formatResult(result));
       } catch (error) {
-        console.log('ERROR');
-        console.log(error);
+        if (error.errors) {
+          socket.emit('error', formatError(error.errors));
+        }
       }
     }
   );

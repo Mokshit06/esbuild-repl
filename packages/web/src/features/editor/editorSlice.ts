@@ -23,6 +23,7 @@ const editorSlice = createSlice({
     config: {
       platform: 'neutral',
     } as Partial<BuildOptions>,
+    errors: [] as { error: string; message: string }[],
   },
   reducers: {
     showInput: state => {
@@ -34,6 +35,13 @@ const editorSlice = createSlice({
     },
     compile: (state, { payload: files }: PayloadAction<File[]>) => {
       state.compiledFiles = files;
+      state.errors = [];
+    },
+    failure: (
+      state,
+      { payload: errors }: PayloadAction<{ error: string; message: string }[]>
+    ) => {
+      state.errors = errors;
     },
     changeFile: (state, { payload: id }: PayloadAction<string>) => {
       state.currentId = id;
@@ -70,6 +78,7 @@ export const {
   showInput,
   updateFile,
   changeCompiledFile,
+  failure,
   updateConfig,
 } = editorSlice.actions;
 

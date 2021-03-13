@@ -1,14 +1,15 @@
 import MonacoEditor, { BeforeMount } from '@monaco-editor/react';
 import path from 'path-browserify';
-import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../app/hooks';
-import { changeFile, updateFile, changeCompiledFile } from './editorSlice';
-import { useCompileFiles } from '../../hooks/useCompileFiles';
+import { useCompileEmit } from '../../hooks/useCompileEmit';
+import { useCompileResult } from '../../hooks/useCompileResult';
 import { useSocket } from '../../hooks/useSocket';
 import getLang from '../../utils/getLang';
 import AddFile from './AddFile';
+import { changeCompiledFile, changeFile, updateFile } from './editorSlice';
 import Tabs from './Tabs';
+import Error from './Error';
 
 export default function Editor() {
   const {
@@ -16,11 +17,12 @@ export default function Editor() {
     currentId,
     currentCompiledId,
     compiledFiles,
-    config,
+    errors,
   } = useAppSelector(state => state.editor);
   const dispatch = useDispatch();
   const { socket } = useSocket();
 
+  const hasError = errors.length > 0;
   const currentFile = files.find(f => f.path === currentId)!;
   const currentCompiledFile = compiledFiles.find(
     f => f.path === currentCompiledId
@@ -30,23 +32,8 @@ export default function Editor() {
   );
   const currentLang = getLang(path.parse(currentFile?.path || 'index.ts').ext);
 
-  useCompileFiles(socket);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const timeout = setTimeout(() => {
-      socket.emit('compile', {
-        files,
-        config,
-      });
-    }, 600);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config, files]);
+  useCompileEmit(socket);
+  useCompileResult(socket);
 
   return (
     <div>
@@ -86,6 +73,7 @@ export default function Editor() {
           />
         </div>
       </div>
+      <div>{hasError && errors.map(e => <Error {...e} />)}</div>
     </div>
   );
 }
