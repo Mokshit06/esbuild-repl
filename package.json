@@ -6,7 +6,9 @@
   "scripts": {
     "web:dev": "yarn workspace web start",
     "server:dev": "yarn workspace server dev",
-    "dev": "yarn workspaces run dev"
+    "start": "yarn workspace server start",
+    "dev": "yarn workspaces run dev",
+    "build": "yarn workspaces run build && mv packages/web/build packages/server/build"
   },
   "workspaces": [
     "packages/*"

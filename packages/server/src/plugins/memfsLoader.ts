@@ -1,11 +1,10 @@
 import { OnLoadResult, Plugin, Loader } from 'esbuild';
-import { File } from '../app';
 import path from 'path';
 
 const MemfsNS = 'memfs';
 
 interface MemfsLoader {
-  files: Array<File>;
+  files: Array<{ path: string; contents: string }>;
 }
 
 const loaderMap: Record<string, Loader> = {
