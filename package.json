@@ -1,0 +1,14 @@
+{
+  "name": "esbuild-repl",
+  "private": true,
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "web:dev": "yarn workspace web start",
+    "server:dev": "yarn workspace server dev",
+    "dev": "yarn workspaces run dev"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
