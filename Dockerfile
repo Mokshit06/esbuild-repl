@@ -14,8 +14,8 @@ COPY . .
 RUN yarn build
 
 ENV NODE_ENV production
-ENV PORT 5000
+ENV PORT 8080
 
-EXPOSE 5000
+EXPOSE 8080
 
 CMD ["yarn", "start"]
